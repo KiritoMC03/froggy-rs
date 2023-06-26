@@ -1,4 +1,4 @@
-[tasks.rust-script]
+[tasks.cpy-lib]
 env = { "CARGO_MAKE_RUST_SCRIPT_PROVIDER" = "rust-script" }
 script_runner = "@rust"
 script = '''

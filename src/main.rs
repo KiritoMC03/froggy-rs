@@ -43,19 +43,19 @@ fn main() {
             &config.into(),
             move |data: &[f32], _| recognize(&mut recognizer_clone.lock().unwrap(), data, channels),
             err_fn,
-            None
+            None,
         ),
         SampleFormat::U16 => audio_input_device.build_input_stream(
             &config.into(),
             move |data: &[u16], _| recognize(&mut recognizer_clone.lock().unwrap(), data, channels),
             err_fn,
-            None
+            None,
         ),
         SampleFormat::I16 => audio_input_device.build_input_stream(
             &config.into(),
             move |data: &[i16], _| recognize(&mut recognizer_clone.lock().unwrap(), data, channels),
             err_fn,
-            None
+            None,
         ),
         _ => todo!(),
     }
@@ -74,7 +74,7 @@ fn recognize<T: Sample + ToSample<i16>>(
     recognizer: &mut Recognizer,
     data: &[T],
     channels: ChannelCount,
-    ) {
+) {
     let data: Vec<i16> = data.iter().map(|v| v.to_sample()).collect();
     let data = if channels != 1 {
         stereo_to_mono(&data)

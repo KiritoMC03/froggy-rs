@@ -1,0 +1,32 @@
+[tasks.rust-script]
+env = { "CARGO_MAKE_RUST_SCRIPT_PROVIDER" = "rust-script" }
+script_runner = "@rust"
+script = '''
+//! ```cargo
+//! [dependencies]
+//! fs_extra = "1.3.0"
+//! ```
+
+use fs_extra::file::copy;
+use fs_extra::file::CopyOptions;
+
+fn main() {
+    let options = CopyOptions::new();
+    for (src, dst) in get_dst_path("debug") {
+        // Copy the files or directories
+        match copy(src, dst, &options) {
+            Ok(_) => println!("Files copied successfully!"),
+            Err(err) => eprintln!("Failed to copy files: {:?}", err),
+        }
+    }
+}
+
+fn get_dst_path(folder: &str) -> [(&str, String); 4] {
+    [
+        ("./vosk/libvosk.dll", format!("./target/{folder}/libvosk.dll")),
+        ("./vosk/libstdc++-6.dll", format!("./target/{folder}/libstdc++-6.dll")),
+        ("./vosk/libgcc_s_seh-1.dll", format!("./target/{folder}/libgcc_s_seh-1.dll")),
+        ("./vosk/libwinpthread-1.dll", format!("./target/{folder}/libwinpthread-1.dll")),
+    ]
+}
+'''

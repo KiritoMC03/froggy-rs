@@ -1,3 +1,5 @@
+pub mod speech_handler;
+
 use std::sync::{Arc, Mutex};
 
 use cpal::{Sample, ChannelCount, traits::{HostTrait, DeviceTrait, StreamTrait}, SampleFormat, Device, SupportedStreamConfig, Stream};

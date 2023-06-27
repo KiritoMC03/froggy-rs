@@ -1,8 +1,6 @@
 mod speech_recogn;
 
-use std::thread;
-
-use speech_recogn::{create_recogizer_stream, RecognizerStreamPrefs, RecognizerData};
+use speech_recogn::{create_recogizer_stream, RecognizerStreamPrefs, RecognizerData, speech_handler::accept_voice};
 
 const RUS_MODEL_PATH: &str = "D:/Varia/Projects/RustProjects/test_speech_recogn/vosk-model-small-ru-0.22";
 
@@ -14,23 +12,12 @@ fn main() {
         keep_partial_words: false,
     };
     let (_stream, recognizer_data) = create_recogizer_stream(prefs);
-    thread::spawn(|| main_loop(recognizer_data));
-    loop { }
+    main_loop(recognizer_data)
 }
 
-fn main_loop(data: RecognizerData) {
+fn main_loop(mut data: RecognizerData) {
     loop {
-        {
-            let mut results_lock = data.results.lock().unwrap();
-            let results = &mut results_lock.results;
-            for (ir, r) in results.drain(..).enumerate() {
-                println!("result ({})", ir);
-                for (i, alt) in r.alternatives.iter().enumerate() {
-                    println!("\t{} ({})", alt, i);
-                }
-            }
-        }
-
+        accept_voice(&mut data);
         std::thread::sleep_ms(100);
     }
 }

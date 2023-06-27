@@ -1,11 +1,23 @@
 use super::RecognizerData;
 
-pub fn accept_voice(recognizer: &mut RecognizerData) {
+pub trait PhraseHandler {
+    fn handle_phrase(&mut self, phrase: &String);
+}
+
+pub fn accept_voice(recognizer: &mut RecognizerData, handlers: &mut Vec<Box<dyn PhraseHandler>>) {
     let results = &mut recognizer.results.lock().unwrap().results;
-    for (ir, result) in results.drain(..).enumerate() {
-        println!("result ({})", ir);
-        for (i, alt) in result.alternatives.iter().enumerate() {
-            println!("\t{} ({})", alt, i);
+    for result in results.drain(..) {
+        for alt in result.alternatives.iter() {
+            if !alt.is_empty() {
+                handle_phrase(alt, handlers);
+            }
         }
+    }
+}
+
+pub fn handle_phrase(phrase: &String, handlers: &mut Vec<Box<dyn PhraseHandler>>) {
+    if phrase.is_empty() { return }
+    for h in handlers {
+        h.as_mut().handle_phrase(phrase);
     }
 }

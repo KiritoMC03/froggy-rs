@@ -1,4 +1,5 @@
 pub mod speech_handler;
+pub mod handlers;
 
 use std::sync::{Arc, Mutex};
 
@@ -93,10 +94,7 @@ pub fn create_stream(
         SampleFormat::F32 => audio_input_device.build_input_stream(
             &config.into(),
             move |data: &[f32], _| {
-//                println!("");
-//                println!("lock");
                 recognize(&mut recognizer.lock().unwrap(), &mut results.lock().unwrap(), data, channels);
-//                println!("unlock");
             },
             err_fn,
             None,
@@ -134,13 +132,11 @@ pub fn recognize<T: Sample + ToSample<i16>> (
     let state = recognizer.accept_waveform(&data);
     match state {
         DecodingState::Running => {
-            //            println!("partial: {:#?}", recognizer.partial_result());
+
         }
         DecodingState::Finalized => {
             // Result will always be multiple because we called set_max_alternatives
-            println!("res write");
             results.results.push(recognizer.result().multiple().unwrap().into());
-//            println!("result: {:#?}", recognizer.result().multiple().unwrap());
         }
         DecodingState::Failed => eprintln!("error"),
     }

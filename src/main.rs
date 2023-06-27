@@ -1,6 +1,18 @@
 mod speech_recogn;
 
-use speech_recogn::{create_recogizer_stream, RecognizerStreamPrefs, RecognizerData, speech_handler::accept_voice};
+use std::time::Duration;
+
+use speech_recogn::{
+    create_recogizer_stream,
+    RecognizerStreamPrefs,
+    RecognizerData,
+    handlers::phrase_logger::PhraseLogger
+};
+
+use speech_recogn::speech_handler::{
+    accept_voice,
+    PhraseHandler
+};
 
 const RUS_MODEL_PATH: &str = "D:/Varia/Projects/RustProjects/test_speech_recogn/vosk-model-small-ru-0.22";
 
@@ -16,8 +28,10 @@ fn main() {
 }
 
 fn main_loop(mut data: RecognizerData) {
+    let mut handlers: Vec<Box<dyn PhraseHandler>> = Vec::new();
+    handlers.push(Box::new(PhraseLogger{}));
     loop {
-        accept_voice(&mut data);
-        std::thread::sleep_ms(100);
+        accept_voice(&mut data, &mut handlers);
+        std::thread::sleep(Duration::from_millis(100));
     }
 }

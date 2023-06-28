@@ -11,12 +11,17 @@ use fs_extra::file::copy;
 use fs_extra::file::CopyOptions;
 
 fn main() {
-    let options = CopyOptions::new();
-    for (src, dst) in get_dst_path("debug") {
-        // Copy the files or directories
-        match copy(src, dst, &options) {
-            Ok(_) => println!("Files copied successfully!"),
-            Err(err) => eprintln!("Failed to copy files: {:?}", err),
+    copy_files("debug");
+    copy_files("release");
+
+    fn copy_files(folder: &str) {
+        let options = CopyOptions::new();
+        for (src, dst) in get_dst_path(folder) {
+            // Copy the files or directories
+            match copy(src, dst, &options) {
+                Ok(_) => println!("Files copied successfully!"),
+                Err(err) => eprintln!("Failed to copy files: {:?}", err),
+            }
         }
     }
 }

@@ -2,6 +2,16 @@ use super::RecognizerData;
 
 pub trait PhraseHandler {
     fn handle_phrase(&mut self, phrase: &String);
+
+    fn match_phrase(&self, phrase: &String, patterns: &[&str]) -> bool {
+        for pat in patterns {
+            if phrase.contains(pat) {
+                return true;
+            }
+        }
+
+        false
+    }
 }
 
 pub fn accept_voice(recognizer: &mut RecognizerData, handlers: &mut Vec<Box<dyn PhraseHandler>>) {

@@ -7,6 +7,9 @@ build = "build.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+calamine = "0.21.2"
 cpal = "0.15.2"
 dasp = "0.11.0"
+dirs = "5.0.1"
+opener = "0.6.1"
 vosk = "0.2.0"

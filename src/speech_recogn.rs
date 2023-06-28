@@ -1,7 +1,7 @@
 pub mod speech_handler;
 pub mod handlers;
 
-use std::sync::{Arc, Mutex};
+use std::{sync::{Arc, Mutex}, time::Duration};
 
 use cpal::{Sample, ChannelCount, traits::{HostTrait, DeviceTrait, StreamTrait}, SampleFormat, Device, SupportedStreamConfig, Stream};
 use dasp::sample::ToSample;
@@ -28,7 +28,7 @@ pub struct RecognitionResult {
 }
 
 impl RecognitionResults {
-    fn new() -> RecognitionResults {
+    pub fn new() -> RecognitionResults {
         RecognitionResults {
             results: Vec::new(),
         }
@@ -49,7 +49,15 @@ impl From<CompleteResultMultiple<'_>> for RecognitionResult {
     }
 }
 
-pub fn create_recogizer_stream(prefs: RecognizerStreamPrefs) -> (Stream, RecognizerData) {
+pub fn create_recogizer_stream_repeating(prefs: RecognizerStreamPrefs, results: Arc<Mutex<RecognitionResults>>, delay: u64) {
+    loop {
+        let stream = create_recogizer_stream(prefs.clone(), results.clone());
+        std::thread::sleep(Duration::from_secs(delay));
+        drop(stream);
+    }
+}
+
+pub fn create_recogizer_stream(prefs: RecognizerStreamPrefs, results: Arc<Mutex<RecognitionResults>>) -> Stream {
     let audio_input_device = cpal::default_host()
         .default_input_device()
         .expect("No input device connected");
@@ -67,16 +75,10 @@ pub fn create_recogizer_stream(prefs: RecognizerStreamPrefs) -> (Stream, Recogni
     recognizer.set_partial_words(prefs.keep_partial_words);
 
     let recognizer = Arc::new(Mutex::new(recognizer));
-    let results = Arc::new(Mutex::new(RecognitionResults::new()));
-    let stream = create_stream(config, audio_input_device, recognizer.clone(), results.clone(), channels);
+    let stream = create_stream(config, audio_input_device, recognizer.clone(), results, channels);
 
     stream.play().expect("Could not play stream");
-    (
-        stream,
-        RecognizerData {
-            results,
-        }
-    )
+    stream
 }
 
 pub fn create_stream(
@@ -136,6 +138,7 @@ pub fn recognize<T: Sample + ToSample<i16>> (
         }
         DecodingState::Finalized => {
             // Result will always be multiple because we called set_max_alternatives
+            println!("len: {}", results.results.len());
             results.results.push(recognizer.result().multiple().unwrap().into());
         }
         DecodingState::Failed => eprintln!("error"),

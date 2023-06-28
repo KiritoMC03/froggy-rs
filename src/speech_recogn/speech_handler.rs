@@ -1,12 +1,23 @@
+use crate::utils::str_simmilarity;
+
 use super::RecognizerData;
 
 pub trait PhraseHandler {
     fn handle_phrase(&mut self, phrase: &String);
+    fn min_phrases_simmilarity(&self) -> f64 {
+        0.0
+    }
 
     fn match_phrase(&self, phrase: &String, patterns: &[&str]) -> bool {
         for pat in patterns {
             if phrase.contains(pat) {
                 return true;
+            }
+
+            for word in phrase.split(' ') {
+                if str_simmilarity(word, pat) > self.min_phrases_simmilarity() {
+                    return true;
+                }
             }
         }
 

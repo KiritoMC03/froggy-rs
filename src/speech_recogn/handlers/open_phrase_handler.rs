@@ -4,11 +4,12 @@ use calamine::{open_workbook, Xlsx, Reader, Error};
 
 use crate::speech_recogn::speech_handler::PhraseHandler;
 
-const OPEN_KEYS : [&str; 1] = ["открой"];
+const OPEN_KEYS : &[&str] = &["открой", "запусти", "включи"];
 
 pub struct OpenPhraseHandler {
     commands: Vec<OpenCommand>,
     phrases_xlsx: PathBuf,
+    min_phrases_simmilarity: f64,
 }
 
 #[derive(Debug, Clone)]
@@ -23,10 +24,11 @@ struct OpenCommandsXlsxIterator {
 }
 
 impl OpenPhraseHandler {
-    pub fn new(phrases_xlsx: PathBuf) -> OpenPhraseHandler {
+    pub fn new(phrases_xlsx: PathBuf, min_phrases_simmilarity: f64) -> OpenPhraseHandler {
         let mut result = OpenPhraseHandler {
             commands: Vec::new(),
             phrases_xlsx,
+            min_phrases_simmilarity,
         };
         
         if let Ok(iter) = OpenCommandsXlsxIterator::new(result.phrases_xlsx.clone()) {
@@ -72,6 +74,11 @@ impl PhraseHandler for OpenPhraseHandler {
             }
             return;
         }
+    }
+
+    fn min_phrases_simmilarity(&self) -> f64 {
+        println!("sim: {}", self.min_phrases_simmilarity);
+        self.min_phrases_simmilarity
     }
 }
 

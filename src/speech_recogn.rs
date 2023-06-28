@@ -13,6 +13,7 @@ pub struct RecognizerStreamPrefs {
     pub max_alternatives: u16,
     pub keep_words: bool,
     pub keep_partial_words: bool,
+    pub min_phrases_simmilarity: f64,
 }
 
 pub struct RecognizerData {

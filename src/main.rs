@@ -1,10 +1,10 @@
 mod speech_recogn;
 mod paths;
+mod utils;
 
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
-use dirs::document_dir;
 use paths::Paths;
 use speech_recogn::{
     RecognizerStreamPrefs,
@@ -31,6 +31,7 @@ fn main() {
         max_alternatives: 10,
         keep_words: false,
         keep_partial_words: false,
+        min_phrases_simmilarity: 0.7,
     };
 
     let results = Arc::new(Mutex::new(RecognitionResults::new()));
@@ -39,16 +40,17 @@ fn main() {
     };
 
     let results_clone = recognizer_data.results.clone();
+    let prefs_clone = prefs.clone();
     std::thread::spawn(move || {
-        create_recogizer_stream_repeating(prefs.clone(), results_clone, 100);
+        create_recogizer_stream_repeating(prefs_clone, results_clone, 100);
     });
-    main_loop(recognizer_data, paths);
+    main_loop(recognizer_data, prefs, paths);
 }
 
-fn main_loop(mut data: RecognizerData, paths: Paths) {
+fn main_loop(mut data: RecognizerData, prefs: RecognizerStreamPrefs, paths: Paths) {
     let mut handlers: Vec<Box<dyn PhraseHandler>> = Vec::new();
     handlers.push(Box::new(PhraseLogger{}));
-    handlers.push(Box::new(OpenPhraseHandler::new(paths.open_phrases)));
+    handlers.push(Box::new(OpenPhraseHandler::new(paths.open_phrases, prefs.min_phrases_simmilarity)));
 
     loop {
         accept_voice(&mut data, &mut handlers);

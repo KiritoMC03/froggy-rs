@@ -6,15 +6,18 @@ use crate::speech_recogn::speech_handler::PhraseHandler;
 
 const OPEN_KEYS : &[&str] = &["открой", "запусти", "включи"];
 
+type ComandKey = String;
+
 pub struct OpenPhraseHandler {
     commands: Vec<OpenCommand>,
+    last_command_key: ComandKey,
     phrases_xlsx: PathBuf,
     min_phrases_simmilarity: f64,
 }
 
 #[derive(Debug, Clone)]
 struct OpenCommand {
-    key: String,
+    key: ComandKey,
     path: String,
 }
 
@@ -27,6 +30,7 @@ impl OpenPhraseHandler {
     pub fn new(phrases_xlsx: PathBuf, min_phrases_simmilarity: f64) -> OpenPhraseHandler {
         let mut result = OpenPhraseHandler {
             commands: Vec::new(),
+            last_command_key: String::with_capacity(0),
             phrases_xlsx,
             min_phrases_simmilarity,
         };
@@ -67,7 +71,11 @@ impl PhraseHandler for OpenPhraseHandler {
     fn handle_phrase(&mut self, phrase: &String) {
         if self.match_phrase(phrase, &OPEN_KEYS) {
             for command in self.commands.iter() {
+                if command.key == self.last_command_key {
+                    continue;
+                }
                 if self.match_phrase(phrase, &[command.key.as_str()]) {
+                    self.last_command_key = command.key.clone();
                     self.open(&command.path);
                     return;
                 }
@@ -76,8 +84,11 @@ impl PhraseHandler for OpenPhraseHandler {
         }
     }
 
+    fn handle_empty_tick(&mut self) {
+        self.last_command_key = String::with_capacity(0);
+    }
+
     fn min_phrases_simmilarity(&self) -> f64 {
-        println!("sim: {}", self.min_phrases_simmilarity);
         self.min_phrases_simmilarity
     }
 }

@@ -4,6 +4,9 @@ use super::RecognizerData;
 
 pub trait PhraseHandler {
     fn handle_phrase(&mut self, phrase: &String);
+
+    fn handle_empty_tick(&mut self) {}
+
     fn min_phrases_simmilarity(&self) -> f64 {
         0.0
     }
@@ -27,6 +30,10 @@ pub trait PhraseHandler {
 
 pub fn accept_voice(recognizer: &mut RecognizerData, handlers: &mut Vec<Box<dyn PhraseHandler>>) {
     let results = &mut recognizer.results.lock().unwrap().results;
+    if results.len() == 0 {
+        handle_empty_tick(handlers);
+        return;
+    }
     for result in results.drain(..) {
         for alt in result.alternatives.iter() {
             if !alt.is_empty() {
@@ -40,5 +47,11 @@ pub fn handle_phrase(phrase: &String, handlers: &mut Vec<Box<dyn PhraseHandler>>
     if phrase.is_empty() { return }
     for h in handlers {
         h.as_mut().handle_phrase(phrase);
+    }
+}
+
+fn handle_empty_tick(handlers: &mut Vec<Box<dyn PhraseHandler>>) {
+    for h in handlers {
+        h.as_mut().handle_empty_tick();
     }
 }

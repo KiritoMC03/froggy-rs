@@ -12,6 +12,7 @@ use std::time::Duration;
 use lang_learning::run_learning_cycle;
 use paths::Paths;
 use speech_recogn::handlers::listening_handler::ListeningHandler;
+use speech_recogn::handlers::thanks_handler::ThanksHandler;
 use speech_recogn::{
     RecognizerStreamPrefs,
     RecognizerData, RecognitionResults,
@@ -60,6 +61,7 @@ fn main() {
 fn main_loop(mut data: RecognizerData, prefs: RecognizerStreamPrefs, paths: Paths) {
     let mut handlers: Vec<Box<dyn PhraseHandler>> = Vec::new();
     handlers.push(Box::new(PhraseLogger{}));
+    handlers.push(Box::new(ThanksHandler::new()));
     handlers.push(Box::new(OpenPhraseHandler::new(paths.open_phrases, prefs.min_phrases_simmilarity)));
     handlers.push(Box::new(ListeningHandler::new(data.handling_enabled.clone())));
 

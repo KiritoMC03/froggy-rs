@@ -140,7 +140,6 @@ pub fn recognize<T: Sample + ToSample<i16>> (
         }
         DecodingState::Finalized => {
             // Result will always be multiple because we called set_max_alternatives
-            println!("len: {}", results.results.len());
             results.results.push(recognizer.result().multiple().unwrap().into());
         }
         DecodingState::Failed => eprintln!("error"),

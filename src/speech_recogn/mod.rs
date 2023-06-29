@@ -1,7 +1,7 @@
 pub mod speech_handler;
 pub mod handlers;
 
-use std::{sync::{Arc, Mutex}, time::Duration};
+use std::{sync::{Arc, Mutex}, time::Duration, cell::RefCell, rc::Rc};
 
 use cpal::{Sample, ChannelCount, traits::{HostTrait, DeviceTrait, StreamTrait}, SampleFormat, Device, SupportedStreamConfig, Stream};
 use dasp::sample::ToSample;
@@ -18,6 +18,7 @@ pub struct RecognizerStreamPrefs {
 
 pub struct RecognizerData {
     pub results: Arc<Mutex<RecognitionResults>>,
+    pub handling_enabled: Rc<RefCell<bool>>,
 }
 
 pub struct RecognitionResults {

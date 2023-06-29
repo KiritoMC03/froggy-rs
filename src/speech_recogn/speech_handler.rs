@@ -11,6 +11,10 @@ pub trait PhraseHandler {
         0.0
     }
 
+    fn accept_phrases_on_disabled(&self) -> bool {
+        false
+    }
+
     fn match_phrase(&self, phrase: &String, patterns: &[&str]) -> bool {
         for pat in patterns {
             if phrase.contains(pat) {
@@ -37,16 +41,19 @@ pub fn accept_voice(recognizer: &mut RecognizerData, handlers: &mut Vec<Box<dyn 
     for result in results.drain(..) {
         for alt in result.alternatives.iter() {
             if !alt.is_empty() {
-                handle_phrase(alt, handlers);
+                let handling_enabled = recognizer.handling_enabled.borrow().clone();
+                handle_phrase(alt, handlers, handling_enabled);
             }
         }
     }
 }
 
-pub fn handle_phrase(phrase: &String, handlers: &mut Vec<Box<dyn PhraseHandler>>) {
+pub fn handle_phrase(phrase: &String, handlers: &mut Vec<Box<dyn PhraseHandler>>, handling_enabled: bool) {
     if phrase.is_empty() { return }
     for h in handlers {
-        h.as_mut().handle_phrase(phrase);
+        if handling_enabled || h.accept_phrases_on_disabled() {
+            h.as_mut().handle_phrase(phrase);
+        }
     }
 }
 

@@ -2,12 +2,16 @@ mod speech_recogn;
 mod paths;
 mod utils;
 mod lang_learning;
+mod notify;
 
+use std::cell::RefCell;
+use std::rc::Rc;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use lang_learning::run_learning_cycle;
 use paths::Paths;
+use speech_recogn::handlers::listening_handler::ListeningHandler;
 use speech_recogn::{
     RecognizerStreamPrefs,
     RecognizerData, RecognitionResults,
@@ -40,6 +44,7 @@ fn main() {
     let results = Arc::new(Mutex::new(RecognitionResults::new()));
     let recognizer_data = RecognizerData {
         results,
+        handling_enabled: Rc::new(RefCell::new(true)),
     };
 
     let results_clone = recognizer_data.results.clone();
@@ -56,6 +61,7 @@ fn main_loop(mut data: RecognizerData, prefs: RecognizerStreamPrefs, paths: Path
     let mut handlers: Vec<Box<dyn PhraseHandler>> = Vec::new();
     handlers.push(Box::new(PhraseLogger{}));
     handlers.push(Box::new(OpenPhraseHandler::new(paths.open_phrases, prefs.min_phrases_simmilarity)));
+    handlers.push(Box::new(ListeningHandler::new(data.handling_enabled.clone())));
 
     loop {
         accept_voice(&mut data, &mut handlers);

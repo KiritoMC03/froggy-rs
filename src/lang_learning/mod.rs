@@ -5,6 +5,8 @@ use tts_rust::{ tts::GTTSClient, languages::Languages };
 use rand::thread_rng;
 use rand::seq::SliceRandom;
 
+use crate::notify::simply_notify;
+
 const STD_WORDS_DELAY : u64 = 1;
 const STD_ITEMS_DELAY : u64 = 3;
 const STD_REPEATS_DELAY : u64 = 10;
@@ -169,12 +171,5 @@ fn is_settings_valid_char(c: &char) -> bool {
 }
 
 pub fn notificate() -> Result<(), notify_rust::error::Error> {
-    custom_notificate("English speaker", "LEARN FUCKING ENGLISH!")
-}
-
-pub fn custom_notificate(appname: &str, bodyname: &str) -> Result<(), notify_rust::error::Error> {
-    notify_rust::Notification::new()
-        .appname(appname)
-        .body(bodyname)
-        .show()
+    simply_notify("LEARN FUCKING ENGLISH!")
 }

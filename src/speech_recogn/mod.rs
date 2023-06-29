@@ -88,7 +88,7 @@ pub fn create_stream(
     recognizer: Arc<Mutex<Recognizer>>,
     results: Arc<Mutex<RecognitionResults>>,
     channels: u16
-    ) -> Stream {
+) -> Stream {
     let err_fn = move |err| {
         eprintln!("an error occurred on stream: {}", err);
     };

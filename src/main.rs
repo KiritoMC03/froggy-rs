@@ -1,10 +1,12 @@
 mod speech_recogn;
 mod paths;
 mod utils;
+mod lang_learning;
 
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
+use lang_learning::run_learning_cycle;
 use paths::Paths;
 use speech_recogn::{
     RecognizerStreamPrefs,
@@ -21,6 +23,7 @@ use speech_recogn::handlers::{
     phrase_logger::PhraseLogger,
     open_phrase_handler::OpenPhraseHandler,
 };
+use tts_rust::languages::Languages;
 
 const RUS_MODEL_PATH: &str = "D:/Varia/Projects/RustProjects/test_speech_recogn/vosk-model-small-ru-0.22";
 
@@ -41,9 +44,11 @@ fn main() {
 
     let results_clone = recognizer_data.results.clone();
     let prefs_clone = prefs.clone();
-    std::thread::spawn(move || {
-        create_recogizer_stream_repeating(prefs_clone, results_clone, 100);
-    });
+    let lang_learn_file_clone = paths.lang_learn_file.clone();
+
+
+    std::thread::spawn(move || run_learning_cycle(lang_learn_file_clone.clone(), lang_learn_file_clone.clone(), Languages::English));
+    std::thread::spawn(move || create_recogizer_stream_repeating(prefs_clone, results_clone, 100));
     main_loop(recognizer_data, prefs, paths);
 }
 

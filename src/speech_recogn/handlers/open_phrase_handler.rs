@@ -2,9 +2,10 @@ use std::{path::{Path, PathBuf}, io::BufReader, fs::File};
 
 use calamine::{open_workbook, Xlsx, Reader, Error};
 
-use crate::speech_recogn::speech_handler::PhraseHandler;
+use crate::{speech_recogn::speech_handler::PhraseHandler, paths::Paths};
 
 const OPEN_KEYS : &[&str] = &["открой", "запусти", "включи"];
+const PREFS_FOLDER_KEY: &str = "папка настроек";
 
 type ComandKey = String;
 
@@ -45,6 +46,13 @@ impl OpenPhraseHandler {
         }
 
         result
+    }
+
+    pub fn append_default_paths(&mut self, paths: &Paths) {
+        self.commands.push(OpenCommand {
+            key: PREFS_FOLDER_KEY.to_string(),
+            path: paths.prefs.to_str().unwrap().to_string(),
+        });
     }
 
     fn open(&self, path: &String) {

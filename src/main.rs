@@ -59,10 +59,13 @@ fn main() {
 }
 
 fn main_loop(mut data: RecognizerData, prefs: RecognizerStreamPrefs, paths: Paths) {
+    let mut open_phrase_handler = OpenPhraseHandler::new(paths.open_phrases.clone(), prefs.min_phrases_simmilarity);
+    open_phrase_handler.append_default_paths(&paths);
+
     let mut handlers: Vec<Box<dyn PhraseHandler>> = Vec::new();
     handlers.push(Box::new(PhraseLogger{}));
     handlers.push(Box::new(ThanksHandler::new()));
-    handlers.push(Box::new(OpenPhraseHandler::new(paths.open_phrases, prefs.min_phrases_simmilarity)));
+    handlers.push(Box::new(open_phrase_handler));
     handlers.push(Box::new(ListeningHandler::new(data.handling_enabled.clone())));
 
     loop {

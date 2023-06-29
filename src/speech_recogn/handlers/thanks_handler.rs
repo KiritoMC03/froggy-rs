@@ -40,14 +40,18 @@ impl PhraseHandler for ThanksHandler {
                         Some(answer) => {
                             let _ = simply_notify(&answer);
                             self.last_pair_idx = idx;
+                            return;
                         },
                         None => break,
                     };
-                    return;
                 }
             }
         }
 
         self.last_pair_idx = usize::MAX;
+    }
+
+    fn min_phrases_simmilarity(&self) -> f64 {
+        0.95
     }
 }

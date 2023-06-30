@@ -59,8 +59,8 @@ impl OpenPhraseHandler {
         let path = Path::new(path);
         if path.exists() {
             match opener::open(path) {
-                Ok(_) => {println!("")},
-                Err(e) => {eprintln!("{}", e)},
+                Ok(_) => { },
+                Err(e) => {eprintln!("Can`t open with error: {}", e)},
             }
         }
     }

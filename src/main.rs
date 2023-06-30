@@ -8,11 +8,10 @@ use std::cell::RefCell;
 use std::rc::Rc;
 use std::sync::{Arc, Mutex};
 use std::time::Duration;
+use tts_rust::languages::Languages;
 
 use lang_learning::run_learning_cycle;
 use paths::Paths;
-use speech_recogn::handlers::listening_handler::ListeningHandler;
-use speech_recogn::handlers::thanks_handler::ThanksHandler;
 use speech_recogn::{
     RecognizerStreamPrefs,
     RecognizerData, RecognitionResults,
@@ -27,8 +26,10 @@ use speech_recogn::speech_handler::{
 use speech_recogn::handlers::{
     phrase_logger::PhraseLogger,
     open_phrase_handler::OpenPhraseHandler,
+    browser_search_handler::BrowserSearchHandler,
+    listening_handler::ListeningHandler,
+    thanks_handler::ThanksHandler,
 };
-use tts_rust::languages::Languages;
 
 const RUS_MODEL_PATH: &str = "D:/Varia/Projects/RustProjects/test_speech_recogn/vosk-model-small-ru-0.22";
 
@@ -66,6 +67,7 @@ fn main_loop(mut data: RecognizerData, prefs: RecognizerStreamPrefs, paths: Path
     handlers.push(Box::new(PhraseLogger{}));
     handlers.push(Box::new(ThanksHandler::new()));
     handlers.push(Box::new(open_phrase_handler));
+    handlers.push(Box::new(BrowserSearchHandler{}));
     handlers.push(Box::new(ListeningHandler::new(data.handling_enabled.clone())));
 
     loop {

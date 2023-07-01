@@ -40,7 +40,7 @@ fn main() {
         max_alternatives: 10,
         keep_words: false,
         keep_partial_words: false,
-        min_phrases_simmilarity: 0.7,
+        min_phrases_simmilarity: 0.8,
     };
 
     let results = Arc::new(Mutex::new(RecognitionResults::new()));
@@ -67,7 +67,7 @@ fn main_loop(mut data: RecognizerData, prefs: RecognizerStreamPrefs, paths: Path
     handlers.push(Box::new(PhraseLogger{}));
     handlers.push(Box::new(ThanksHandler::new()));
     handlers.push(Box::new(open_phrase_handler));
-    handlers.push(Box::new(BrowserSearchHandler{}));
+    handlers.push(Box::new(BrowserSearchHandler::new()));
     handlers.push(Box::new(ListeningHandler::new(data.handling_enabled.clone())));
 
     loop {

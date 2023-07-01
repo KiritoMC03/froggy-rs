@@ -40,7 +40,7 @@ fn main() {
         max_alternatives: 10,
         keep_words: false,
         keep_partial_words: false,
-        min_phrases_simmilarity: 0.8,
+        min_phrases_simmilarity: 0.7,
     };
 
     let results = Arc::new(Mutex::new(RecognitionResults::new()));

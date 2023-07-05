@@ -55,7 +55,7 @@ fn main() {
 
 
     std::thread::spawn(move || run_learning_cycle(lang_learn_file_clone.clone(), lang_learn_file_clone.clone(), Languages::English));
-    std::thread::spawn(move || create_recogizer_stream_repeating(prefs_clone, results_clone, 100));
+    std::thread::spawn(move || create_recogizer_stream_repeating(prefs_clone, results_clone, 3000));
     main_loop(recognizer_data, prefs, paths);
 }
 
